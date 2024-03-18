@@ -15,21 +15,16 @@
        
        <!-- Navigation buttons for larger screens -->
      
-       <v-btn style="margin-left:440px; font-weight: 500;font-family: 'poppins';text-transform: lowercase;"  text to="/" class="hidden-sm-and-down">
+       <v-btn style="margin-left:540px; font-weight: 500;font-family: 'poppins';text-transform: lowercase;"  text to="/" class="hidden-sm-and-down">
          <v-icon size="16">mdi-home</v-icon>Home
        </v-btn>
        <v-btn style="margin:2px;font-weight: 500;font-family: 'poppins';text-transform: lowercase;"  text to="/about" class="hidden-sm-and-down">
          <v-icon size="16">mdi-information</v-icon> About
        </v-btn>
-       <v-btn style="font-weight: 500;font-family: 'poppins';text-transform: lowercase;" text to="/leadership" class="hidden-sm-and-down">
-         <v-icon size="16">mdi-account-tie</v-icon>      </v-btn>
        
-       <v-btn  style="font-weight: 500;font-family: 'poppins';text-transform: lowercase;" text to="/events" class="hidden-sm-and-down">
-         <v-icon size="16">mdi-calendar</v-icon> 
-       </v-btn>
-       <v-btn  style="font-weight: 500;font-family: 'poppins';text-transform: lowercase;" text to="/members" class="hidden-sm-and-down">
-         <v-icon size="16">mdi-account-multiple</v-icon>
-       </v-btn>
+       
+      
+       
        <v-btn  style="font-weight: 500;font-family: 'poppins';text-transform: lowercase;" text to="/contact" class="hidden-sm-and-down">
          <v-icon size="16">mdi-phone</v-icon>Contact
        </v-btn>
@@ -69,23 +64,9 @@
        <span style="text-transform: capitalize;">Contact</span>
      </v-btn>
 
-     <!-- Events -->
-     <v-btn to="/events" class="sidebar-button" elevation="0" active-class="active-button">
-       <v-icon size="16" style="padding-right: 10px;">mdi-calendar</v-icon>
-       <span style="text-transform: capitalize;"></span>
-     </v-btn>
+     
 
-     <!-- All Members -->
-     <v-btn to="/members" class="sidebar-button" elevation="0" active-class="active-button">
-       <v-icon size="16" style="padding-right: 10px;">mdi-account-multiple</v-icon>
-       <span style="text-transform: capitalize;"></span>
-     </v-btn>
-
-     <!-- Contact Us -->
-     <v-btn to="/contact" class="sidebar-button" elevation="0" active-class="active-button">
-       <v-icon size="16" style="padding-right: 10px;">mdi-phone</v-icon>
-       <span style="text-transform: capitalize;">Contact</span>
-     </v-btn>
+    
 
      <!-- Sign Up -->
      <v-btn @click="showSignUpModal" class="sidebar-button" elevation="0" active-class="active-button">
@@ -107,26 +88,27 @@
 
  <!-- Sign In Modal -->
  <v-dialog v-model="signInModal" max-width="600px">
-<v-card style="border-radius: 10px;" elevation="4">
- <v-card-title class="text-center" style="font-weight: 800;">Sign In</v-card-title>
- <v-card-text>
-   <v-form @submit.prevent="signIn">
-     <v-text-field v-model="signInData.email" label="Email" required variant="outlined"></v-text-field>
-     <v-text-field v-model="signInData.password" label="Password" type="password" required variant="outlined"></v-text-field>
-     <v-btn type="submit" color="success" style="border-radius: 10px; width: 100%; text-transform: lowercase;">
-<v-icon left style="margin: 3px;">mdi-login</v-icon>
-Sign In
-</v-btn>
-   </v-form>
-   <p class="text-center" style="padding-top: 12px;font-weight: 600;">Or</p>
-   <!-- Sign in with Google button -->
-   <v-btn color="primary" @click="signInWithGoogle" style="border-radius: 10px; margin-top: 10px;width:100%;text-transform: lowercase;">
-<v-icon left style="margin:3px" color="yellow">mdi-google</v-icon> Sign In with Google
-
-</v-btn>
- </v-card-text>
-</v-card>
+  <v-card style="border-radius: 10px;" elevation="4">
+    <v-card-title class="text-center" style="font-weight: 800;">Sign In</v-card-title>
+    <v-card-text>
+      <v-form @submit.prevent="signIn">
+        <v-text-field v-model="signInData.email" label="Email" required variant="outlined"></v-text-field>
+        <v-text-field v-model="signInData.password" label="Password" type="password" required variant="outlined"></v-text-field>
+        <!-- Login button with loading state -->
+        <v-btn :loading="loading" type="submit" color="success" style="border-radius: 10px; width: 100%; text-transform: lowercase;">
+          <v-icon left style="margin: 3px;">mdi-login</v-icon>
+          Login
+        </v-btn>
+      </v-form>
+      <p class="text-center" style="padding-top: 12px;font-weight: 600;">Or</p>
+      <!-- Sign in with Google button -->
+      <v-btn color="primary" @click="signInWithGoogle" style="border-radius: 10px; margin-top: 10px;width:100%;text-transform: lowercase;">
+        <v-icon left style="margin:3px" color="yellow">mdi-google</v-icon> Sign In with Google
+      </v-btn>
+    </v-card-text>
+  </v-card>
 </v-dialog>
+
 
 
  <!-- Sign Up Modal -->
@@ -169,6 +151,7 @@ export default {
 name: 'App',
 data() {
  return {
+  loading: false, // Add loading state
    sidebar: false,
    scrolled: false,
    isAuthenticated: false,
@@ -243,6 +226,8 @@ methods: {
  });
 },
 signIn() {
+
+  this.loading = true;
   // Send signInData to your backend for authentication using axiosInstance
   axiosInstance.post('/login', this.signInData)
     .then(response => {
@@ -287,7 +272,11 @@ signIn() {
         title: 'Authentication Failed',
         text: error.response.data.error
       });
-    });
+    })
+    .finally(() => {
+          // Set loading state to false when the login process completes (either success or failure)
+          this.loading = false;
+        });
 },
 
 

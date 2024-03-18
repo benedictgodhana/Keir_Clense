@@ -101,10 +101,10 @@ export default {
     };
   },
   mounted() {
-    this.fetchServices(); // Fetch services when the component is mounted
-    // Assuming you also need to check authentication status
-    this.checkAuthentication(); // Check user authentication status
-  },
+  this.fetchServices(); // Fetch services when the component is mounted
+  this.fetchAuthenticationToken(); // Fetch authentication token from local storage
+},
+
   created() {
   // Retrieve the authentication token from local storage
   this.authToken = localStorage.getItem('token');
@@ -112,6 +112,11 @@ export default {
 },
 
   methods: {
+    async fetchAuthenticationToken() {
+    // Retrieve the authentication token from local storage
+    this.authToken = localStorage.getItem('token');
+    console.log('Auth token:', this.authToken); // Log the retrieved token for debugging
+  },
     async fetchAvailableEmployees() {
       try {
         // Make a GET request to fetch available employees for the selected service
@@ -136,20 +141,14 @@ export default {
       selectedProvider: this.selectedProvider,
     };
 
-    // Retrieve the authentication token from local storage
-    const authToken = localStorage.getItem('token');
-
     // Make sure the authentication token is available
-    if (!authToken) {
+    if (!this.authToken) {
       console.error('Authentication token not found');
       return;
     }
 
-    // Log the authentication token for debugging
-    console.log('Auth token:', authToken);
-
     // Set the request headers including the authentication token
-    const headers = { Authorization: `Bearer ${authToken}` };
+    const headers = { Authorization: `Bearer ${this.authToken}` };
 
     // Make a POST request to book the service with the authentication token included in the headers
     const response = await axiosInstance.post('/bookings', bookingData, { headers });
