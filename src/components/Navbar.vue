@@ -256,7 +256,7 @@ signIn() {
       // Redirect based on user's role
       if (role === 'admin') {
         this.$router.push('/admin');
-      } else if (role === 'member') {
+      } else if (role === 'customer') {
         this.$router.push('/welcomepage');
       }
 

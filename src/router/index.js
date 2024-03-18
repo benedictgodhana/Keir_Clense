@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Events from '../views/UpcomingEvents.vue'
-import WelcomePage from '../views/Member/welcomepage.vue'
+import WelcomePage from '../views/Customer/welcomepage.vue'
 import AdminDashboard from '../views/Admin/DashboardPage.vue'
 import ManageUsers from '../views/Admin/ManageUsers.vue'
 import ManageServices from '../views/Admin/ManageServices.vue'
