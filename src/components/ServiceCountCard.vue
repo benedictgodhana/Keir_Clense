@@ -1,7 +1,7 @@
 <template>
     <v-card style="margin: 8px;border-radius: 10px;" variant="outlined" elevation="3" width="300">
-      <v-img src="/path/to/your/image.jpg" height="50" contain></v-img>
-      <v-card-title>Number of Services</v-card-title>
+      <v-img src="/house-keeping_11165679.png" style="margin-top: 10px;" height="50" contain></v-img>
+      <v-card-title style="font-size: 14px;">Number of Services</v-card-title>
       <v-card-text>{{ serviceCount }}</v-card-text>
       <v-card-actions>
         <v-btn color="primary" style="background: yellow;width: 100%;text-transform: lowercase;"><v-icon>mdi-link</v-icon>View Services</v-btn>

@@ -1,10 +1,10 @@
 <template>
   <v-card style="margin: 8px;border-radius: 10px;" variant="outlined" elevation="3" height="200" width="300">
-    <v-img src="/path/to/your/image.jpg" height="50" contain></v-img>
-    <v-card-title>Number of Users</v-card-title>
+    <v-img src="/multiple-users-silhouette_33308.png" style="margin-top: 10px;" height="50" contain></v-img>
+    <v-card-title style="font-size: 14px;">Number of Users</v-card-title>
     <v-card-text>{{ userCount }}</v-card-text>
     <v-card-actions>
-      <v-btn color="primary" style="background: yellow;width: 100%;text-transform: lowercase;"><v-icon>mdi-link</v-icon>View Users</v-btn>
+      <v-btn color="primary"  style="background: yellow;width: 100%;text-transform: lowercase;"><v-icon>mdi-link</v-icon>View Users</v-btn>
     </v-card-actions>
   </v-card>
 </template>

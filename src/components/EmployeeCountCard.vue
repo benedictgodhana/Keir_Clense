@@ -1,8 +1,8 @@
 <template>
     <v-card style="margin: 8px;border-radius: 10px;" variant="outlined" height="200" elevation="3" width="300">
-        <v-img src="/path/to/your/image.jpg" height="50" contain></v-img>
+        <v-img src="/employee_11802935.png" height="50" style="margin-top: 10px;" contain></v-img>
 
-      <v-card-title>Number of Employees</v-card-title>
+      <v-card-title style="font-size: 14px;">Number of Employees</v-card-title>
       <v-card-text>{{ employeeCount }}</v-card-text>
 
       <v-card-actions>

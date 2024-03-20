@@ -148,7 +148,7 @@ export default {
     }
 
     // Set the request headers including the authentication token
-    const headers = { Authorization: `Bearer ${this.authToken}` };
+    const headers = { Authorization: `Bearer ${this.token}` };
 
     // Make a POST request to book the service with the authentication token included in the headers
     const response = await axiosInstance.post('/bookings', bookingData, { headers });

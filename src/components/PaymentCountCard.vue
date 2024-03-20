@@ -1,10 +1,10 @@
 <template>
     <v-card variant="outlined" height="200" elevation="3" style="margin: 8px;border-radius: 10px;" width="300">
       <!-- Image -->
-      <v-img src="/path/to/payment/image.jpg" height="50" contain></v-img>
+      <v-img src="/money-bills-simple_9798334.png" style="margin-top: 10px;" height="50" contain></v-img>
   
       <!-- Title -->
-      <v-card-title>Number of Payments</v-card-title>
+      <v-card-title style="font-size: 14px;">Number of Payments</v-card-title>
   
       <!-- Count -->
       <v-card-text><span>ksh.</span> {{ paymentCount }}</v-card-text>

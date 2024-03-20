@@ -82,6 +82,13 @@
    </v-list-item-group>
  </v-list>
 </v-navigation-drawer>
+<v-alert ref="loginSuccessAlert" type="success" dismissible v-model="loginSuccessAlertVisible">
+  Login Successful!
+</v-alert>
+
+<v-alert ref="registerSuccessAlert" type="success" dismissible v-model="registerSuccessAlertVisible">
+  Registration Successful!
+</v-alert>
 
 
 
@@ -112,28 +119,28 @@
 
 
  <!-- Sign Up Modal -->
- <v-dialog v-model="signUpModal" max-width="700px" >
-<v-card style="border-radius: 10px;" elevation="4" height="100%">
- <v-card-title class="text-center" style="color:black;font-weight: 800;" >Sign Up</v-card-title>
- <v-card-text>
-   <v-form @submit.prevent="signUp">
-     <v-text-field v-model="signUpData.firstName" label="First Name" required variant="outlined"></v-text-field>
-     <v-text-field v-model="signUpData.lastName" label="Last Name" required variant="outlined"></v-text-field>
-     <v-text-field v-model="signUpData.email" label="Email" required variant="outlined"></v-text-field>
-     <v-text-field v-model="signUpData.password" label="Password" type="password" required variant="outlined"></v-text-field>
-     <v-btn type="submit" color="success" style="border-radius:10px;width:100%">
-<v-icon>mdi-account-plus</v-icon> Sign Up
-</v-btn>
-   </v-form>
-   <p class="text-center" style="padding-top: 12px;font-weight: 700;">Or</p>
-   <!-- Sign in with Google button -->
-   <v-btn color="primary" @click="signInWithGoogle" style="border-radius: 10px; margin-top: 10px;width:100%;text-transform: lowercase;">
-<v-icon left style="margin:3px" color="yellow">mdi-google</v-icon> Sign Up with Google
-
-</v-btn>
- </v-card-text>
-</v-card>
+ <v-dialog v-model="signUpModal" max-width="700px">
+  <v-card style="border-radius: 10px;" elevation="4" height="100%">
+    <v-card-title class="text-center" style="color:black;font-weight: 800;">Sign Up</v-card-title>
+    <v-card-text>
+      <v-form @submit.prevent="signUp">
+        <v-text-field v-model="signUpData.name" label="Name" required variant="outlined"></v-text-field>
+        <v-text-field v-model="signUpData.email" label="Email" required variant="outlined"></v-text-field>
+        <v-text-field v-model="signUpData.password" label="Password" type="password" required variant="outlined"></v-text-field>
+        <v-text-field v-model="signUpData.passwordConfirmation" label="Confirm Password" type="password" required variant="outlined"></v-text-field>
+        <v-btn :loading="loading"  type="submit" color="success" style="border-radius: 10px; width: 100%;">
+          <v-icon>mdi-account-plus</v-icon> Sign Up
+        </v-btn>
+      </v-form>
+      <p class="text-center" style="padding-top: 12px;font-weight: 700;">Or</p>
+      <!-- Sign in with Google button -->
+      <v-btn color="primary" @click="signInWithGoogle" style="border-radius: 10px; margin-top: 10px; width: 100%; text-transform: lowercase;">
+        <v-icon left style="margin: 3px" color="yellow">mdi-google</v-icon> Sign Up with Google
+      </v-btn>
+    </v-card-text>
+  </v-card>
 </v-dialog>
+
 
 
 
@@ -151,6 +158,8 @@ export default {
 name: 'App',
 data() {
  return {
+  loginSuccessAlertVisible: false, // Initially set to false
+  registerSuccessAlertVisible: false, // Initially set to false
   loading: false, // Add loading state
    sidebar: false,
    scrolled: false,
@@ -158,10 +167,10 @@ data() {
    signInModal: false,
    signUpModal: false,
    signUpData: {
-     firstName: '',
-     lastName: '',
-     email: '',
-     password: ''
+    name: '',
+      email: '',
+      password: '',
+      passwordConfirmation: ''
    },
    signInData: {
      email: '',
@@ -226,66 +235,70 @@ methods: {
  });
 },
 signIn() {
+      this.loading = true;
+      axiosInstance.post('/login', this.signInData)
+        .then(response => {
+          const token = response.data.token;
+          localStorage.setItem('token', token);
+          const role = response.data.role;
 
-  this.loading = true;
-  // Send signInData to your backend for authentication using axiosInstance
-  axiosInstance.post('/login', this.signInData)
-    .then(response => {
-      // Store the token in local storage
-      const token = response.data.token;
-      localStorage.setItem('token', token);
+          // Show login success alert
+          this.loginSuccessAlertVisible = true;
 
-      // Retrieve the user's role from the response data
-      const role = response.data.role;
+          // Hide the alert after 2 seconds
+          setTimeout(() => {
+            this.loginSuccessAlertVisible = false;
+          }, 2000);
 
-      // Redirect based on user's role
-      if (role === 'admin') {
-        this.$router.push('/admin');
-      } else if (role === 'customer') {
-        this.$router.push('/welcomepage');
-      }
+          // Redirect based on user's role
+          if (role === 'admin') {
+            this.$router.push('/admin');
+        } else if (role === 'customer') {
+            this.$router.push('/welcomepage');
+        } else if (role === 'employee') {
+            this.$router.push('/employee');
+        }
 
-      // Set the token in the Axios instance headers for subsequent requests
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      // Show success alert
-      this.$swal({
-        icon: 'success',
-        title: 'Login Successful',
-        text: 'You have been successfully logged in!',
-        timer: 3000, // Auto close after 3 seconds
-        timerProgressBar: true,
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false
-      });
-
-      // Optionally, close the modal
-      this.signInModal = false;
-    })
-    .catch(error => {
-      // Handle authentication errors
-      console.error('Authentication failed:', error.response.data.error);
-      // Show error alert
-      this.$swal({
-        icon: 'error',
-        title: 'Authentication Failed',
-        text: error.response.data.error
-      });
-    })
-    .finally(() => {
-          // Set loading state to false when the login process completes (either success or failure)
+          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          this.signInModal = false;
+        })
+        .catch(error => {
+          console.error('Authentication failed:', error.response.data.error);
+          this.$swal({
+            icon: 'error',
+            title: 'Authentication Failed',
+            text: error.response.data.error
+          });
+        })
+        .finally(() => {
           this.loading = false;
         });
-},
+    },
 
 
- signUp() {
-   console.log('Signing up with:', this.signUpData);
-   // After successful sign-up, you might want to close the modal
-   this.signUpModal = false;
-   // You can also send this.signUpData to your backend for registration
- }
+    signUp() {
+      this.loading = true; // Set loading to true during sign up
+      axiosInstance.post('/register', this.signUpData)
+        .then(response => {
+          console.log('Sign-up successful:', response.data);
+          // Show register success alert
+          this.registerSuccessAlertVisible = true;
+
+          // Hide the alert after 2 seconds
+          setTimeout(() => {
+            this.registerSuccessAlertVisible = false;
+          }, 2000);
+        })
+        .catch(error => {
+          console.error('Sign-up failed:', error.response.data);
+        })
+        .finally(() => {
+          this.loading = false;
+          this.signUpModal = false;
+        });
+    }
+
 },
 watch: {
  // Watch for changes in the router's current route

@@ -3,10 +3,13 @@ import HomeView from '../views/HomeView.vue'
 import Events from '../views/UpcomingEvents.vue'
 import WelcomePage from '../views/Customer/welcomepage.vue'
 import AdminDashboard from '../views/Admin/DashboardPage.vue'
+import EmployeePage from '../views/Employee/EmployeePage.vue'
 import ManageUsers from '../views/Admin/ManageUsers.vue'
 import ManageServices from '../views/Admin/ManageServices.vue'
 import ManageBookings from '../views/Admin/ManageBookings.vue'
 import ManageEmployees from '../views/Admin/ManageEmployees.vue'
+import Bookings from '../views/Employee/ManageBookings.vue'
+
 
 
 
@@ -21,6 +24,12 @@ const router = createRouter({
       name: 'home',
       component: HomeView,
       meta:{auth:false}
+    },
+    {
+      path: '/employee',
+      name: 'EmployeePage ',
+      component:EmployeePage ,
+      meta: { requiresAuth: true },
     },
     {
       path: '/welcomepage',
@@ -56,6 +65,12 @@ const router = createRouter({
       path: '/admin/manage-bookings',
       name: 'ManageBookings',
       component: ManageBookings,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/employee/manage-bookings',
+      name: 'Bookings',
+      component: Bookings,
       meta: { requiresAuth: true },
     },
     {
