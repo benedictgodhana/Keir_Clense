@@ -75,7 +75,7 @@
 
 <script>
 import axiosInstance from '@/service/api';
-import Navbar from '@/components/AdminNavbar.vue';
+import Navbar from '@/components/CustomerNavbar.vue';
 
 export default {
   components: {
@@ -101,87 +101,74 @@ export default {
     };
   },
   mounted() {
-  this.fetchServices(); // Fetch services when the component is mounted
-  this.fetchAuthenticationToken(); // Fetch authentication token from local storage
-},
-
+    this.fetchServices(); // Fetch services when the component is mounted
+    this.fetchAuthenticationToken(); // Fetch authentication token from local storage
+  },
   created() {
-  // Retrieve the authentication token from local storage
-  this.authToken = localStorage.getItem('token');
-  console.log('Auth token:', this.authToken); // Log the retrieved token for debugging
-},
-
-  methods: {
-    async fetchAuthenticationToken() {
-    // Retrieve the authentication token from local storage
     this.authToken = localStorage.getItem('token');
     console.log('Auth token:', this.authToken); // Log the retrieved token for debugging
   },
+  methods: {
+    async fetchAuthenticationToken() {
+      this.authToken = localStorage.getItem('token');
+      console.log('Auth token:', this.authToken); // Log the retrieved token for debugging
+    },
     async fetchAvailableEmployees() {
       try {
-        // Make a GET request to fetch available employees for the selected service
         const response = await axiosInstance.get(`/available-employees?service=${this.selectedService}`, {
           headers: {
-            Authorization: `Bearer ${this.authToken}`, // Pass the authentication token in the request headers
+            Authorization: `Bearer ${this.authToken}`,
           },
         });
-        // Assuming response data is an array of employee names
         this.availableEmployees = response.data;
       } catch (error) {
         console.error('Error fetching available employees:', error);
+        // Handle error, e.g., show an error message to the user
       }
     },
     async submitForm() {
-  try {
-    // Prepare booking data
-    const bookingData = {
-      date: this.date,
-      time: this.time,
-      location: this.location,
-      selectedProvider: this.selectedProvider,
-    };
+      try {
+        const bookingData = {
+          date: this.date,
+          time: this.time,
+          location: this.location,
+          selectedProvider: this.selectedProvider,
+        };
 
-    // Make sure the authentication token is available
-    if (!this.authToken) {
-      console.error('Authentication token not found');
-      return;
-    }
+        if (!this.authToken) {
+          console.error('Authentication token not found');
+          // Provide feedback to the user that they need to log in
+          return;
+        }
 
-    // Set the request headers including the authentication token
-    const headers = { Authorization: `Bearer ${this.token}` };
+        const headers = { Authorization: `Bearer ${this.authToken}` };
 
-    // Make a POST request to book the service with the authentication token included in the headers
-    const response = await axiosInstance.post('/bookings', bookingData, { headers });
+        const response = await axiosInstance.post('/bookings', bookingData, { headers });
 
-    // Log the booking response for debugging
-    console.log('Booking response:', response.data);
+        console.log('Booking response:', response.data);
 
-    // Close the dialog after successful booking
-    this.closeForm();
-  } catch (error) {
-    console.error('Error booking service:', error);
-  }
-},
-
+        this.closeForm();
+      } catch (error) {
+        console.error('Error booking service:', error);
+        // Provide feedback to the user that there was an error in booking the service
+      }
+    },
     closeForm() {
-      // Close the dialog by setting dialog to false
       this.dialog = false;
     },
     navigateToService(service) {
-      // Set the selected service
       this.selectedService = service.name;
-      // Fetch available employees for the selected service
       this.fetchAvailableEmployees();
-      // Show the booking form dialog
       this.dialog = true;
     },
     fetchServices() {
       axiosInstance.get('/services')
         .then(response => {
-          this.services = response.data; // Update services with the response data
+          this.services = response.data;
         })
         .catch(error => {
           console.error('Error fetching services:', error);
+          // Handle error, e.g., show an error message to the user
         });
     },
     checkAuthentication() {
@@ -192,7 +179,6 @@ export default {
   },
 };
 </script>
-
 <style>
 .overlay {
   position: absolute;

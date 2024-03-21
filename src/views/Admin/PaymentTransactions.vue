@@ -56,7 +56,7 @@
         <v-card>
           <v-card-title>Edit Transaction Status</v-card-title>
           <v-card-text>
-            <v-select v-model="selectedTransactionStatus" :items="statusOptions" label="Status"></v-select>
+            <v-select v-model="selectedTransactionStatus" :items="statusOptions" label="Status" variant="outlined"></v-select>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="updateTransactionStatus">Save</v-btn>
