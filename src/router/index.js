@@ -9,6 +9,9 @@ import ManageServices from '../views/Admin/ManageServices.vue'
 import ManageBookings from '../views/Admin/ManageBookings.vue'
 import ManageEmployees from '../views/Admin/ManageEmployees.vue'
 import Bookings from '../views/Employee/ManageBookings.vue'
+import ManageReviews from '../views/Admin/ManageReviews.vue';
+import ManagePayments from '../views/Admin/PaymentTransactions.vue';
+
 
 
 
@@ -65,6 +68,18 @@ const router = createRouter({
       path: '/admin/manage-bookings',
       name: 'ManageBookings',
       component: ManageBookings,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/admin/manage-reviews',
+      name: 'ManageReviews',
+      component: ManageReviews,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/admin/manage-payments',
+      name: 'ManagePayment',
+      component: ManagePayments,
       meta: { requiresAuth: true },
     },
     {

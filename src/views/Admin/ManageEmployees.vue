@@ -77,8 +77,8 @@
         sidebar: true,
         updateSuccessAlertVisible: false,
         tableHeaders: [
-          { title: 'Employee ID', value: 'id' },
           { title: 'Employee Name', value: 'user_name' },
+          { title: 'Employee Email', value: 'user_email' },
           { title: 'Service Name', value: 'service_name' },
           { title: 'Action', value: 'action ' },
         ],
