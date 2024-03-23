@@ -18,7 +18,6 @@
       <v-card-title style="background: yellow;">Employees with Services</v-card-title>
       
       <v-card-text style="margin-top: 20px;">
-        <v-btn color="primary" style="text-transform: capitalize;" @click="addEmployeeWithServiceDialog">Add Employee with Service</v-btn>
 
         <v-data-table
           :headers="tableHeaders"
@@ -68,37 +67,7 @@
     </v-dialog>
 
     <!-- Add Employee with Service Dialog -->
-    <v-dialog v-model="addEmployeeDialogVisible" max-width="500">
-      <v-card>
-        <v-card-title>Add Employee with Service</v-card-title>
-        <v-card-text>
-          <v-select
-            v-model="selectedServiceForAdd"
-            :items="serviceNames"
-            item-text="name"
-            label="Select Service"
-            outlined
-            dense
-            required
-          ></v-select>
-
-          <v-select
-            v-model="selectedEmployeeForAdd"
-            :items="employeeNames"
-            item-text="name"
-            label="Select Employee"
-            outlined
-            dense
-            required
-          ></v-select>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn color="primary" @click="addEmployeeWithService">Add</v-btn>
-          <v-btn color="primary" @click="addEmployeeDialogVisible = false">Cancel</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
+   
   </v-container>
 </template>
 

@@ -249,9 +249,9 @@
 
       async fetchServices() {
   try {
-    const response = await axiosInstance.get('/services');
+    const response = await axiosInstance.get('/get_services');
       // Store the fetched services in the services array
-      this.services = response.data.services.map(service =>service.name );
+      this.services = response.data.services.map(service =>service.id );
    
   } catch (error) {
     console.error('Error fetching services:', error);
