@@ -86,7 +86,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-
       <v-dialog v-model="addUserDialogVisible" max-width="600">
   <v-card>
     <v-card-title>Add User</v-card-title>
@@ -102,9 +101,19 @@
           item-value="id"
           required
         ></v-select>
+              <v-select
+        v-if="newUser.role === 'employee'"
+        v-model="newUser.service_id"
+        :items="services"
+        item-text="name"         
+        item-value="id" 
+        label="Service" 
+        required
+      ></v-select>
+
+        <!-- Add a v-select field to select the service -->
         <v-text-field v-model="newUser.password" label="Password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'" required></v-text-field>
         <v-text-field v-model="confirmPassword" label="Confirm Password" :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showConfirmPassword = !showConfirmPassword" :type="showConfirmPassword ? 'text' : 'password'" required></v-text-field>
-
         <!-- Add more fields as needed -->
       </v-form>
     </v-card-text>
@@ -114,6 +123,8 @@
     </v-card-actions>
   </v-card>
 </v-dialog>
+
+
 
 
 
@@ -134,6 +145,7 @@
     },
     data() {
       return {
+        services: [], // Initialize an empty array for services
         sidebar: true, // Initialize the sidebar as open
         users: [], // Initialize an empty array for user details
         roles: [], // Initialize an empty array for role options
@@ -156,13 +168,15 @@
           email: '',
           password:'',
           role: null, // Initialize to null
+          
           // Other fields...
         },
         newUser: {
           name: '',
           email: '',
           password:'',
-          role: '', // Initialize role properly        
+          role: '', // Initialize role properly   
+          service_id: '', // Initialize service_id to null     
           // Other fields...
         },
 
@@ -177,6 +191,7 @@
       // Fetch user details from the backend when the component is created
       this.fetchUsers();
 
+      this.fetchServices();
       // Fetch role options from the backend
       this.fetchRoles();
     },
@@ -231,6 +246,18 @@
         // Method to toggle the sidebar
         this.sidebar = !this.sidebar;
       },
+
+      async fetchServices() {
+  try {
+    const response = await axiosInstance.get('/services');
+      // Store the fetched services in the services array
+      this.services = response.data.services.map(service =>service.name );
+   
+  } catch (error) {
+    console.error('Error fetching services:', error);
+  }
+},
+
       
       async fetchUsers() {
         try {
@@ -299,31 +326,42 @@
       },
 
       async submitAddUser() {
-      try {
-        // Make an API call to add the new user
-        const response = await axiosInstance.post('/users', this.newUser);
-        console.log('User added:', response.data);
-        // Display success alert
-        this.addSuccessSnackbarVisible = true;
-        setTimeout(() => {
-          this.addSuccessSnackbarVisible = false;
-        }, 4000);
-        // Reset newUser
-        this.newUser = {
-          name: '',
-          email: '',
-          role: '',
-          password: ''
-          // Other fields...
-        };
-        // Close add user dialog
-        this.addUserDialogVisible = false;
-        // Refresh the user list
-        this.fetchUsers();
-      } catch (error) {
-        console.error('Error adding user:', error);
-      }
-    },
+  try {
+    // Make an API call to add the new user
+    let requestData = {
+      name: this.newUser.name,
+      email: this.newUser.email,
+      role: this.newUser.role,
+      password: this.newUser.password,
+      
+      // Add service_id if the role is employee
+      ...(this.newUser.role === 'employee' ? { service_id: this.newUser.service_id } : {})
+      // Add other fields as needed
+    };
+    const response = await axiosInstance.post('/users', requestData);
+    console.log('User added:', response.data);
+    // Display success alert
+    this.addSuccessSnackbarVisible = true;
+    setTimeout(() => {
+      this.addSuccessSnackbarVisible = false;
+    }, 4000);
+    // Reset newUser
+    this.newUser = {
+      name: '',
+      email: '',
+      role: '',
+      password: '',
+      service_id: '', // Reset service_id to null
+      // Other fields...
+    };
+    // Close add user dialog
+    this.addUserDialogVisible = false;
+    // Refresh the user list
+    this.fetchUsers();
+  } catch (error) {
+    console.error('Error adding user:', error);
+  }
+},
 
       cancelAddUser() {
         // Reset newUser

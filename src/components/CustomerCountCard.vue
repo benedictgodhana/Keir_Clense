@@ -17,13 +17,30 @@
   </template>
   
   <script>
-  export default {
-    props: {
-      customerCount: {
-        type: Number,
-        required: true
+// Import your Axios instance
+import axiosInstance from '../service/api'; // Import the Axios instance
+
+export default {
+  data() {
+    return {
+      customerCount: 0 // Initialize employee count
+    };
+  },
+  created() {
+    this.fetchCustomers();
+  },
+  methods: {
+    async fetchCustomers() {
+      try {
+        // Use axiosInstance instead of axios
+        const response = await axiosInstance.get('/customers/count');
+        // Make sure to adjust the response according to your backend setup
+        this.customerCount = response.data.customer_count; // Assign count to employeeCount
+      } catch (error) {
+        console.error('Error fetching customers:', error);
       }
     }
-  };
-  </script>
+  }
+};
+</script>
   

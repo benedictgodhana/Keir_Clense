@@ -235,46 +235,52 @@ methods: {
  });
 },
 signIn() {
-      this.loading = true;
-      axiosInstance.post('/login', this.signInData)
-        .then(response => {
-          const token = response.data.token;
-          localStorage.setItem('token', token);
-          const role = response.data.role;
+  this.loading = true;
+  axiosInstance.post('/login', this.signInData)
+    .then(response => {
+      const token = response.data.token;
+      const role = response.data.role;
+      const user = response.data.user; // Assuming user details are returned in the response
 
-          // Show login success alert
-          this.loginSuccessAlertVisible = true;
+      // Save token, role, and user details to local storage
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+      localStorage.setItem('user', JSON.stringify(user));
 
-          // Hide the alert after 2 seconds
-          setTimeout(() => {
-            this.loginSuccessAlertVisible = false;
-          }, 2000);
+      // Show login success alert
+      this.loginSuccessAlertVisible = true;
 
-          // Redirect based on user's role
-          if (role === 'admin') {
-            this.$router.push('/admin');
-        } else if (role === 'customer') {
-            this.$router.push('/welcomepage');
-        } else if (role === 'employee') {
-            this.$router.push('/employee');
-        }
+      // Hide the alert after 2 seconds
+      setTimeout(() => {
+        this.loginSuccessAlertVisible = false;
+      }, 2000);
 
+      // Redirect based on user's role
+      if (role === 'admin') {
+        this.$router.push('/admin');
+      } else if (role === 'customer') {
+        this.$router.push('/welcomepage');
+      } else if (role === 'employee') {
+        this.$router.push('/employee');
+      }
 
-          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          this.signInModal = false;
-        })
-        .catch(error => {
-          console.error('Authentication failed:', error.response.data.error);
-          this.$swal({
-            icon: 'error',
-            title: 'Authentication Failed',
-            text: error.response.data.error
-          });
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    },
+      // Set authorization header for future requests
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      this.signInModal = false;
+    })
+    .catch(error => {
+      console.error('Authentication failed:', error.response.data.error);
+      this.$swal({
+        icon: 'error',
+        title: 'Authentication Failed',
+        text: error.response.data.error
+      });
+    })
+    .finally(() => {
+      this.loading = false;
+    });
+},
+
 
 
     signUp() {
