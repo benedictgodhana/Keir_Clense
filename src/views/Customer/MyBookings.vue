@@ -20,8 +20,8 @@
            style="text-transform:none; width: 100%;"
          >
            <template v-slot:item.action="{ item }">
-             <v-btn color="primary" class="mr-4" @click="openEditDialog(item)" style="text-transform:capitalize;"><span class="mdi mdi-pencil"></span>Edit</v-btn>
-             <v-btn color="yellow" style="text-transform: capitalize;" @click="viewBookingDetails(item)"><v-icon>mdi-eye</v-icon>View Details</v-btn>        
+             <v-btn color="" elevation="0"  @click="openEditDialog(item)" style="text-transform:capitalize;"><span style="color:green" class="mdi mdi-pencil"></span></v-btn>
+             <v-btn color=""  elevation="0"  style="text-transform: capitalize;" @click="viewBookingDetails(item)"><v-icon>mdi-eye</v-icon></v-btn>        
                </template>
          </v-data-table>
        </v-card-text>
