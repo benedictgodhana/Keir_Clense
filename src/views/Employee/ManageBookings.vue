@@ -55,7 +55,7 @@
 <script>
 // Import necessary modules
 import axiosInstance from '@/service/api'; // Import your axios instance
-import Navbar from '@/components/CustomerNavbar.vue';
+import Navbar from '@/components/AdminNavbar.vue';
 import EmployeeSidebar from '@/components/EmployeeSidebar.vue';
 
 
