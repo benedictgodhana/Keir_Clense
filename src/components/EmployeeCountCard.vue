@@ -6,7 +6,7 @@
     <v-card-text>{{ employeeCount }}</v-card-text>
 
     <v-card-actions>
-      <v-btn color="primary" style="background: yellow; width: 100%; text-transform: lowercase;">
+      <v-btn color="primary" to="/admin/manage-employees"  style="background: yellow; width: 100%; text-transform: lowercase;">
         <v-icon>mdi-link</v-icon>View Employees
       </v-btn>
     </v-card-actions>

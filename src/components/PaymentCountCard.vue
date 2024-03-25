@@ -11,7 +11,7 @@
   
       <!-- Button -->
       <v-card-actions>
-        <v-btn color="primary" style="background: yellow;width: 100%;text-transform: lowercase;">View Payments</v-btn>
+        <v-btn color="primary" to="/admin/manage-payments" style="background: yellow;width: 100%;text-transform: lowercase;">View Payments</v-btn>
       </v-card-actions>
     </v-card>
   </template>

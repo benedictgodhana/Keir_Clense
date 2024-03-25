@@ -1,6 +1,8 @@
 <template>
   <div>
     <Navbar></Navbar>
+
+    
     <v-container>
       <v-carousel cycle :show-arrows="false" hide-delimiter-background style="border-radius: 20px 20px 0 0;" height="500">
         <!-- Carousel items -->
@@ -23,42 +25,98 @@
       </v-sheet>
     </v-container>
 
-    <!-- Dialog for booking form -->
-   <!-- Dialog for booking form -->
-<v-dialog v-model="dialog" max-width="500">
+
+    <v-dialog v-model="dialog" max-width="600">
   <v-card style="width:100%;">
-    <v-card-title class="headline text-center">Book Service: {{ selectedService }}</v-card-title>       
+    <v-card-title class="headline text-center">Book Service: {{ selectedService }}</v-card-title>   
+   
+    
     <v-card-text>
       <!-- Form fields for selecting date, time, location, and service provider -->
       <v-form ref="form">
-        <v-text-field v-model="date" label="Select Date" type="date"   :min="today"></v-text-field>
+        <v-alert v-if="bookingError" type="error" outlined dismissible>
+     The employee Selected is already booked at this time. Please select another time.
+</v-alert>
+    
+        <v-text-field v-model="date" label="Select Date" type="date" :min="today"></v-text-field>
         <v-text-field v-model="time" label="Select Time" type="time"></v-text-field>
+       
         <v-text-field v-model="location" label="Location" placeholder="Enter Location"></v-text-field>
+        <v-text-field v-model="contact" label="Contact Details" placeholder="Enter your contact details"></v-text-field>
         <!-- Hidden field for selected service ID -->
         <input type="hidden" v-model="selectedServiceId">
         <!-- Hidden field for user ID -->
         <input type="hidden" v-model="authenticatedUser.id">
-        <v-select
-  v-model="selectedProvider"
-  :items="availableEmployees"
-  label="Select Service Provider"
-  item-text="text"
-  item-value="id"
-  :rules="[v => !!v || 'Employee is required']"
-></v-select>
-
-
-        
+        <v-container></v-container>
+        <!-- Display service providers as cards -->
+        <v-row>
+          <v-col v-for="(provider, index) in availableEmployees" :key="index" cols="12" md="6">
+            <v-card 
+              @click="selectProvider(provider)" 
+              class="pa-4 cursor-pointer" 
+              elevation="4" 
+              style="border-radius: 10px;width:100%;" 
+              variant="outlined"
+            >
+              <!-- Add icon directly -->
+              <v-icon 
+                size="22" 
+                style="margin-left: 10px;"
+              >
+                {{ provider === selectedProvider ? 'mdi-checkbox-marked-circle' : 'mdi-checkbox-blank-circle-outline' }}
+              </v-icon>
+              <v-icon color="green">mdi-account</v-icon>
+              <v-card-title color="black" style="font-size: 16px;">{{ provider.name }}</v-card-title>
+              <!-- Provider details here, e.g., icon and name -->
+            </v-card>
+          </v-col>
+        </v-row>
         <!-- Select the service provider -->
-       </v-form>
+        
+        <!-- Method of Payment -->
+      <!-- Method of Payment -->
+<v-radio-group v-model="paymentMethod" row>
+  <v-radio
+    v-for="method in paymentMethods"
+    :key="method.value"
+    :label="method.name"
+    :value="method.value"
+  >
+    <template v-slot:prepend>
+      <img :src="method.image" alt="" height="30px">
+    </template>
+  </v-radio>
+</v-radio-group>
+
+      </v-form>
     </v-card-text>
     <v-card-actions class="justify-center">
       <!-- Buttons for submitting the form and closing the dialog -->
-      <v-btn color="primary" @click="submitForm">Submit</v-btn>
-      <v-btn color="primary" @click="closeForm">Close</v-btn>
+      <v-btn
+  color="white"
+  style="background: green;border-radius: 10px;"
+  elevation="4"
+  @click="submitForm"
+  :disabled="submitting" 
+>
+  <template v-if="submitting">
+    <v-progress-circular
+      indeterminate
+      color="white"
+      size="24"
+      width="2"
+    ></v-progress-circular> 
+  </template>
+  <template v-else>
+    Submit
+  </template>
+</v-btn>
+
+      <v-btn color="white" style="background: red;border-radius: 10px;" elevation="4" @click="closeForm">Close</v-btn>
     </v-card-actions>
   </v-card>
 </v-dialog>
+
 
 
     
@@ -69,7 +127,8 @@
     <v-alert v-if="bookingSuccess" type="success" outlined dismissible>
       Booking successful!
     </v-alert>
-    
+
+   
       <v-sheet class="about-section">
         <v-card-title class="text-center">Available Cleaning Services</v-card-title>
       </v-sheet>
@@ -89,6 +148,9 @@
               </v-card>
             </v-col>
           </v-row>
+
+          
+
         </v-carousel-item>
       </v-carousel>
     </v-container>
@@ -105,13 +167,19 @@ export default {
   },
   data() {
     return {
+      bookingError: null,
+
+      contact: '', // New contact field
+    paymentMethod: null, // New selected payment method
+    submitting: false, // Boolean to track the submitting state
+  
       today: new Date().toISOString().substr(0, 10), // Set today's date in ISO format (YYYY-MM-DD)
       bookingSuccess: false, // Track the success state of the booking
       dialog: false, // Controls the visibility of the dialog
       date: null, // Selected date
       time: null, // Selected time
       location: '', // Selected location
-      selectedProvider: null,
+      selectedProvider: {},
       selectedServiceId: null,
       availableEmployees: [],
       services: [], // List of available services
@@ -123,13 +191,20 @@ export default {
         { image: '/smiling-positive-housewife-with-dreadlocks-holds-mop.jpg' },
         // Add more carousel items as needed
       ],
+      paymentMethods: [
+  { name: 'M-Pesa', value: 'mpesa', image: '/images.png' },
+  { name: 'Cash', value: 'cash' },
+  { name: 'Bank Transfer', value: 'bank_transfer' }
+],
+
+
     };
   },
   computed: {
   formattedEmployees() {
     return this.availableEmployees.map(employee => ({
-      text: employee.name, // Display name of the employee
-      value: employee.id, // ID of the employee
+      text: employee.name, // Assuming 'name' is the correct property
+      value: employee.id, // Assuming 'id' is the correct property
     }));
   }
 },
@@ -145,6 +220,9 @@ export default {
     console.log('Auth token:', this.authToken); // Log the retrieved token for debugging
   },
   methods: {
+    selectProvider(provider) {
+    this.selectedProvider = provider;
+  },
     async fetchAuthenticationToken() {
       this.authToken = localStorage.getItem('token');
       console.log('Auth token:', this.authToken); // Log the retrieved token for debugging
@@ -156,41 +234,40 @@ export default {
       }
     },
     async fetchAvailableEmployees() {
-      try {
-        const response = await axiosInstance.get(`/services/${this.selectedServiceId}/employees`, {
-          headers: {
-            Authorization: `Bearer ${this.authToken}`,
-          },
-        });
+  try {
+    const response = await axiosInstance.get(`/services/${this.selectedServiceId}/employees`, {
+      headers: {
+        Authorization: `Bearer ${this.authToken}`,
+      },
+    });
 
-        if ('employees' in response.data && Array.isArray(response.data.employees)) {
-          const employeeData = response.data.employees.map(employee => ({
-            value: employee.id,
-            text: employee.name,
-          }));
-          
-          this.availableEmployees = employeeData;
-        } else {
-          console.error('Unexpected response data format:', response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching available employees:', error);
-        // Handle error, e.g., show an error message to the user
-      }
-    },
-
-
+    if ('employees' in response.data && Array.isArray(response.data.employees)) {
+      const employeeData = response.data.employees.map(employee => ({
+        id: employee.id,
+        name: employee.name,
+        // Add any additional fields you want to retrieve and use in your cards
+      }));
+      
+      this.availableEmployees = employeeData;
+    } else {
+      console.error('Unexpected response data format:', response.data);
+    }
+  } catch (error) {
+    console.error('Error fetching available employees:', error);
+    // Handle error, e.g., show an error message to the user
+  }
+},
 
 async submitForm() {
   try {
+    this.submitting = true;
+
     // Retrieve user data from local storage
     const userData = JSON.parse(localStorage.getItem('user'));
 
     // Check if user data and user ID are available
     if (!userData || !userData.id) {
       console.error('User data or user ID not found');
-      // Provide feedback to the user that something went wrong
-      // For example, display an error message
       return;
     }
 
@@ -202,18 +279,18 @@ async submitForm() {
 
     // Prepare booking data
     const bookingData = {
-      user_id: userData.id, // User ID from local storage
-      date_time: dateTime, // Date and time of the booking
-      location: this.location, // Location of the booking
-      service_id: this.selectedServiceId, // Selected service ID
-      employee_id: employeeId, // Extracted employee ID
+      user_id: userData.id,
+      date_time: dateTime,
+      location: this.location,
+      service_id: this.selectedServiceId,
+      employee_id: this.selectedProvider.id,
+      contact: this.contact,
+      payment_method: this.paymentMethod,
     };
 
     // Check if authentication token is available
     if (!this.authToken) {
       console.error('Authentication token not found');
-      // Provide feedback to the user that they need to log in
-      // For example, redirect to the login page
       return;
     }
 
@@ -223,23 +300,30 @@ async submitForm() {
     // Send a POST request to create the booking
     const response = await axiosInstance.post('/bookings', bookingData, { headers });
 
-    // Log booking response for debugging
-    console.log('Booking response:', response.data);
-
-    // Update booking success state to show success message
-    this.bookingSuccess = true; 
-
-    // Hide the success message after a certain delay
-    setTimeout(this.hideSuccessMessage, 4000);
-
-    // Close the booking form dialog
-    this.closeForm();
+    // If employee is already booked, display an error message
+    if (response.data.error) {
+      this.bookingError = response.data.error;
+      this.dialog = false; // Close the dialog if there's an error
+      setTimeout(() => {
+        this.bookingError = null; // Hide the error message after 3 seconds
+      }, 3000);
+    } else {
+      console.log('Booking response:', response.data);
+      this.bookingSuccess = true;
+      setTimeout(this.hideSuccessMessage, 4000);
+      this.closeForm();
+    }
   } catch (error) {
     console.error('Error booking service:', error);
-    // Provide feedback to the user that there was an error in booking the service
-    // For example, display an error message to the user
+    this.bookingError = 'An error occurred while booking the service. Please try again later.';
+    setTimeout(() => {
+      this.bookingError = null; // Hide the error message after 3 seconds
+    }, 3000);
+  } finally {
+    this.submitting = false;
   }
 },
+
     hideSuccessMessage() {
       this.bookingSuccess = false;
     },
@@ -321,4 +405,9 @@ async submitForm() {
   border-radius: 10px; /* Rounded corners */
   object-fit: cover; /* Ensure the image covers the entire space */
 }
+.selected-card {
+  background-color: red;
+  border-width: 2px;
+}
+
 </style>

@@ -28,7 +28,7 @@
       </v-list-item>
 
       <!-- Manage Payments -->
-      <v-list-item to="/admin/manage-payments"prepend-icon="mdi-currency-usd" title="Manage Payments"   elevation="0" active-class="active-button">
+      <v-list-item to="/admin/manage-payments" prepend-icon="mdi-currency-usd" title="Manage Payments"   elevation="0" active-class="active-button">
       </v-list-item>
     </v-list>
   </v-navigation-drawer>

@@ -4,7 +4,7 @@
       <v-card-title style="font-size: 14px;">Number of Services</v-card-title>
       <v-card-text>{{ serviceCount }}</v-card-text>
       <v-card-actions>
-        <v-btn color="primary" style="background: yellow;width: 100%;text-transform: lowercase;"><v-icon>mdi-link</v-icon>View Services</v-btn>
+        <v-btn color="primary" to="/admin/manage-services" style="background: yellow;width: 100%;text-transform: lowercase;"><v-icon>mdi-link</v-icon>View Services</v-btn>
       </v-card-actions>
     </v-card>
   </template>
