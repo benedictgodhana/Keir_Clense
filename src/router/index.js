@@ -12,6 +12,9 @@ import Bookings from '../views/Employee/ManageBookings.vue'
 import ManageReviews from '../views/Admin/ManageReviews.vue';
 import ManagePayments from '../views/Admin/PaymentTransactions.vue';
 import MyBookings from '../views/Customer/MyBookings.vue';
+import MyProfile from '../views/Customer/MyProfile.vue';
+
+
 
 
 
@@ -40,6 +43,12 @@ const router = createRouter({
       path: '/my-bookings',
       name: 'MyBookings ',
       component:MyBookings,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/my-profile',
+      name: 'MyProfile ',
+      component:MyProfile,
       meta: { requiresAuth: true },
     },
     {

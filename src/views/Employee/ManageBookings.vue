@@ -21,8 +21,8 @@
            style="text-transform:none; width: 100%;"
          >
            <template v-slot:item.action="{ item }">
-             <v-btn color="primary" class="mr-4" @click="openEditDialog(item)" style="text-transform:capitalize;"><span class="mdi mdi-pencil"></span>Edit</v-btn>
-             <v-btn color="yellow" style="text-transform: capitalize;" @click="viewBookingDetails(item)"><v-icon>mdi-eye</v-icon>View Details</v-btn>        
+             <v-btn color="transparent" elevation="0"  @click="openEditDialog(item)" style="text-transform:capitalize;"><span style="color:green" class="mdi mdi-pencil"></span></v-btn>
+             <v-btn color="transparent"  elevation="0" style="text-transform: capitalize;" @click="viewBookingDetails(item)"><v-icon>mdi-eye</v-icon></v-btn>        
                </template>
          </v-data-table>
        </v-card-text>
@@ -49,6 +49,40 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+
+    <!-- Dialog for editing booking details -->
+<v-dialog v-model="editDialogVisible" max-width="600px">
+  <v-card>
+    <v-card-title>Edit Booking</v-card-title>
+    <v-card-text>
+      <v-container>
+        <v-row>
+          <v-col cols="12">
+            <v-text-field
+              v-model="editBookingData.comments"
+              label="Comments"
+              outlined
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-select
+              v-model="editBookingData.status"
+              :items="statusOptions"
+              label="Status"
+              outlined
+            ></v-select>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="red" text @click="editDialogVisible = false">Cancel</v-btn>
+      <v-btn color="green" text @click="saveBookingDetails">Save</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
   </div>
 </template>
 
@@ -75,6 +109,7 @@ export default {
         { title: 'Date', value: 'date_time' },
         { title: 'Location', value: 'location' },
         { title: 'Status', value: 'status' },
+        { title: 'Comment', value: 'comments' },
         { title: 'Action', value: 'action' },
         // Add more headers as needed
       ],
@@ -82,6 +117,13 @@ export default {
       search: '', // Search query for v-data-table
       dialogVisible: false, // Boolean to control dialog visibility
       selectedBooking: null, // Store selected booking details
+      editDialogVisible: false, // Controls the visibility of the edit dialog
+      editBookingData: { 
+        id: null, // Add this line// Data model for the form in the edit dialog
+        comments: '',
+        status: ''
+      },
+      statusOptions: ['pending', 'confirmed', 'cancelled'], // Options for the booking status
     };
   },
 
@@ -91,6 +133,15 @@ export default {
   },
 
   methods: {
+    openEditDialog(booking) {
+      this.editBookingData = {
+        id: booking.id, // Ensure this is correctly assigned
+        comments: booking.comments || '', // Load current comments or set to empty string if none
+        status: booking.status || 'pending', // Load current status or set to 'pending' if undefined
+      };
+      this.editDialogVisible = true;
+    },
+
     // Method to fetch user booking history
     async fetchBookingHistory() {
       try {
@@ -118,6 +169,24 @@ export default {
         // Handle error, e.g., show an error message to the user
       }
     },
+
+    async saveBookingDetails() {
+      try {
+        // Assume you have a booking ID to use for an API endpoint
+        const bookingId = this.editBookingData.id;
+        // Make an API call to save the updated booking details
+        await axiosInstance.put(`/bookings/update/${bookingId}`, this.editBookingData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        
+        this.editDialogVisible = false; // Close the dialog
+        this.fetchBookingHistory(); // Refresh the booking history to show the updated details
+      } catch (error) {
+        console.error('Error saving booking details:', error);
+        // Handle the error, e.g., show an error message
+      }
+    },
+  
 
     // Method to view details of a specific booking
     viewBookingDetails(booking) {

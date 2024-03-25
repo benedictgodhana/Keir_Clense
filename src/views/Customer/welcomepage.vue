@@ -12,7 +12,7 @@
             <v-img src="/logo.png" alt="Logo" class="logo mr-2" max-height="60" contain></v-img>
             <span class="headline text-white" style="text-transform: none;">Welcome to Keir Clense</span>
             <p class="subtext text-white"> Where Freshness Meets Flawlessness</p>
-            <v-btn large to="/get-involved" class="btn-get-involved" style="text-transform: capitalize;border-radius:20px 0px 20px ;background:yellow;color:black;width:200px" elevation="4">
+            <v-btn large to="" class="btn-get-involved" style="text-transform: capitalize;border-radius:20px 0px 20px ;background:yellow;color:black;width:200px" elevation="4">
               <v-icon>mdi-washing-machine-alert</v-icon>Explore!
             </v-btn>
           </div>

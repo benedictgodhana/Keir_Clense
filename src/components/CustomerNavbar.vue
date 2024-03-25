@@ -10,7 +10,7 @@
       <v-btn style="margin-left: auto; font-weight: 500; font-family: 'poppins'; text-transform: lowercase;" text to="/welcomepage">
         <v-icon size="16" color="success">mdi-home</v-icon> Home
       </v-btn>
-      <v-btn style="margin-left: 10px; font-weight: 500; font-family: 'poppins'; text-transform: lowercase;" text @click="navigateToProfile">
+      <v-btn style="margin-left: 10px; font-weight: 500; font-family: 'poppins'; text-transform: lowercase;" text to="/my-profile">
         <v-icon size="16" color="success">mdi-account-circle</v-icon> Profile
       </v-btn>
       

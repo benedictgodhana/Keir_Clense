@@ -71,6 +71,7 @@ export default {
         { title: 'Date', value: 'date_time' },
         { title: 'Location', value: 'location' },
         { title: 'Status', value: 'status' },
+        { title: 'Comment from Service Provider', value: 'comments' },
         { title: 'Action', value: 'action' },
         // Add more headers as needed
       ],
