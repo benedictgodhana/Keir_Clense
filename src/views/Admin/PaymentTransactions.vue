@@ -51,19 +51,21 @@
 </v-card>
 
   
-      <!-- Dialog for editing transaction status -->
-      <v-dialog v-model="editDialog" max-width="600">
-        <v-card>
-          <v-card-title>Edit Transaction Status</v-card-title>
-          <v-card-text>
-            <v-select v-model="selectedTransactionStatus" :items="statusOptions" label="Status" variant="outlined"></v-select>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn color="primary" @click="updateTransactionStatus">Save</v-btn>
-            <v-btn @click="editDialog = false">Cancel</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+  <!-- Dialog for editing transaction status and Transaction ID -->
+<v-dialog v-model="editDialog" max-width="600">
+  <v-card>
+    <v-card-title>Edit Transaction</v-card-title>
+    <v-card-text>
+      <v-text-field v-model="selectedTransaction.transaction_id" label="Transaction ID" outlined></v-text-field>
+       <v-select v-model="selectedTransactionStatus" :items="statusOptions" label="Status" outlined></v-select>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="primary" @click="updateTransactionStatus">Save</v-btn>
+      <v-btn @click="editDialog = false">Cancel</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
   
       <!-- Dialog for viewing transaction details -->
      <!-- Dialog for viewing transaction details -->
@@ -130,9 +132,9 @@
         ],
         editDialog: false, // Flag to control edit dialog visibility
         viewDialog: false, // Flag to control view dialog visibility
-        selectedTransaction: null, // Currently selected transaction for editing or viewing
+        selectedTransaction:'', // Currently selected transaction for editing or viewing
         selectedTransactionStatus: '', // Selected status for transaction
-        statusOptions: ['Pending', 'Success', 'Failed'], // Options for transaction status
+        statusOptions: ['Pending', 'Confirmed', 'Failed'], // Options for transaction status
       };
     },
     created() {
@@ -151,6 +153,9 @@
       },
     },
     methods: {
+    
+
+
       async fetchTransactions() {
         try {
           const response = await axiosInstance.get('/payment-transactions');
@@ -180,20 +185,32 @@
       this.editDialog = true;
     },
     async updateTransactionStatus() {
-      try {
-        // Make an API call to update transaction status
-        const response = await axiosInstance.put(`/payment-transactions/${this.selectedTransaction.id}`, {
-          status: this.selectedTransactionStatus,
-        });
-        console.log('Transaction status updated:', response.data);
-        // Close edit dialog
-        this.editDialog = false;
-        // Refresh transaction list
-        this.fetchTransactions();
-      } catch (error) {
-        console.error('Error updating transaction status:', error);
-      }
-    },
+  try {
+    // Ensure that the Transaction ID field is not empty
+    if (!this.selectedTransaction.transaction_id) {
+      console.error('Transaction ID is required.');
+      return; // Stop further execution
+    }
+
+    // Make an API call to update transaction status and Transaction ID
+    const { id, status, transaction_id } = this.selectedTransaction;
+    const updatedData = {
+      status: this.selectedTransactionStatus,
+      transaction_id: transaction_id // Include transaction_id in the request payload
+    };
+
+    const response = await axiosInstance.put(`/payment-transactions/${id}`, updatedData);
+    console.log('Transaction status updated:', response.data);
+
+    // Close edit dialog
+    this.editDialog = false;
+    // Refresh transaction list
+    this.fetchTransactions();
+  } catch (error) {
+    console.error('Error updating transaction status:', error);
+  }
+},
+
     viewDetails(transaction) {
       // Set selected transaction for viewing
       this.selectedTransaction = transaction;

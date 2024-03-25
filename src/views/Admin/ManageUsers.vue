@@ -86,8 +86,10 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-dialog v-model="addUserDialogVisible" max-width="600">
+      <v-dialog v-model="addUserDialogVisible" max-width="800">
   <v-card>
+
+    
     <v-card-title>Add User</v-card-title>
     <v-card-text>
       <v-form ref="addUserForm" >
@@ -101,15 +103,17 @@
           item-value="id"
           required
         ></v-select>
-              <v-select
-        v-if="newUser.role === 'employee'"
-        v-model="newUser.service_id"
-        :items="services"
-        item-text="name"         
-        item-value="id" 
-        label="Service" 
-        required
-      ></v-select>
+        <div v-if="newUser.role === 'employee'">
+  <label>Select a Service:</label>
+  <div v-for="service in services" :key="service.id">
+    <v-checkbox
+      v-model="selectedServiceId"
+      :label="service.name"
+      :value="service.id"
+    ></v-checkbox>
+  </div>
+</div>
+
 
         <!-- Add a v-select field to select the service -->
         <v-text-field v-model="newUser.password" label="Password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'" required></v-text-field>
@@ -145,6 +149,7 @@
     },
     data() {
       return {
+        selectedServiceId: null,
         services: [], // Initialize an empty array for services
         sidebar: true, // Initialize the sidebar as open
         users: [], // Initialize an empty array for user details
@@ -250,9 +255,11 @@
       async fetchServices() {
   try {
     const response = await axiosInstance.get('/get_services');
-      // Store the fetched services in the services array
-      this.services = response.data.services.map(service =>service.id );
-   
+    // Store the fetched services in the services array
+    this.services = response.data.services.map(service => ({
+      id: service.id,
+      name: service.name
+    }));
   } catch (error) {
     console.error('Error fetching services:', error);
   }
@@ -324,7 +331,6 @@
         // Close delete user dialog
         this.deleteUserDialogVisible = false;
       },
-
       async submitAddUser() {
   try {
     // Make an API call to add the new user
@@ -333,11 +339,10 @@
       email: this.newUser.email,
       role: this.newUser.role,
       password: this.newUser.password,
-      
-      // Add service_id if the role is employee
-      ...(this.newUser.role === 'employee' ? { service_id: this.newUser.service_id } : {})
+      service_id: this.selectedServiceId, // Include selected service ID
       // Add other fields as needed
     };
+
     const response = await axiosInstance.post('/users', requestData);
     console.log('User added:', response.data);
     // Display success alert
@@ -345,15 +350,15 @@
     setTimeout(() => {
       this.addSuccessSnackbarVisible = false;
     }, 4000);
-    // Reset newUser
+    // Reset newUser and selectedServiceId
     this.newUser = {
       name: '',
       email: '',
       role: '',
       password: '',
-      service_id: '', // Reset service_id to null
       // Other fields...
     };
+    this.selectedServiceId = null; // Reset selected service ID
     // Close add user dialog
     this.addUserDialogVisible = false;
     // Refresh the user list
@@ -362,6 +367,7 @@
     console.error('Error adding user:', error);
   }
 },
+
 
       cancelAddUser() {
         // Reset newUser
