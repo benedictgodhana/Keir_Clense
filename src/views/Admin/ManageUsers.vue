@@ -17,6 +17,10 @@
       User added successfully!
     </v-alert>
     
+
+    <v-alert v-model="deleteSuccessAlertVisible" type="success" dismissible>
+      User deleted successfully!
+    </v-alert>
       <!-- Vuetify datatable to display user details -->
       <v-card variant="outlined" style="width: 100%; margin-top: 20px;">
        
@@ -60,9 +64,7 @@
         ></v-select>
         <v-text-field v-model="editedUser.password" label="Password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'" required></v-text-field>
         <v-text-field v-model="confirmPassword" label="Confirm Password" :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showConfirmPassword = !showConfirmPassword" :type="showConfirmPassword ? 'text' : 'password'" required></v-text-field>
-        <!-- Add more text fields for other editable fields -->
 
-        <!-- Add more text fields as needed -->
       </v-form>
     </v-card-text>
     <v-card-actions>
@@ -73,23 +75,11 @@
 </v-dialog>
 
   
-      <!-- Delete User Dialog -->
-      <v-dialog v-model="deleteUserDialogVisible" max-width="600">
-        <v-card>
-          <v-card-title>Delete User</v-card-title>
-          <v-card-text>
-            <p>Are you sure you want to delete this user?</p>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn color="error" @click="deleteUser">Delete</v-btn>
-            <v-btn @click="deleteUserDialogVisible = false">Cancel</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog v-model="addUserDialogVisible" max-width="800">
-  <v-card>
 
-    
+
+
+        <v-dialog v-model="addUserDialogVisible" max-width="800">
+  <v-card>
     <v-card-title>Add User</v-card-title>
     <v-card-text>
       <v-form ref="addUserForm" >
@@ -113,9 +103,6 @@
     ></v-checkbox>
   </div>
 </div>
-
-
-        <!-- Add a v-select field to select the service -->
         <v-text-field v-model="newUser.password" label="Password" :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showPassword = !showPassword" :type="showPassword ? 'text' : 'password'" required></v-text-field>
         <v-text-field v-model="confirmPassword" label="Confirm Password" :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showConfirmPassword = !showConfirmPassword" :type="showConfirmPassword ? 'text' : 'password'" required></v-text-field>
         <!-- Add more fields as needed -->
@@ -129,6 +116,21 @@
 </v-dialog>
 
 
+
+      <!-- Delete User Dialog -->
+     <!-- Delete User Dialog -->
+     <v-dialog v-model="deleteUserDialogVisible" max-width="600">
+  <v-card>
+    <v-card-title>Delete User</v-card-title>
+    <v-card-text>
+      <p>Are you sure you want to delete this user?</p>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="error" @click="deleteUser">Delete</v-btn>
+      <v-btn @click="deleteUserDialogVisible = false">Cancel</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 
 
 
@@ -149,6 +151,7 @@
     },
     data() {
       return {
+        deleteUserDialogVisible: false, // Whether delete user dialog is visible
         selectedServiceId: null,
         services: [], // Initialize an empty array for services
         sidebar: true, // Initialize the sidebar as open
@@ -163,6 +166,7 @@
           { title: 'Action', value: 'action' },
           // Add more headers as needed
         ],
+        deleteSuccessAlertVisible: false, // Whether delete success alert is visible
         editUserDialogVisible: false, // Whether edit user dialog is visible
         deleteUserDialogVisible: false, // Whether delete user dialog is visible
         addUserDialogVisible: false, // Whether add user dialog is visible
@@ -209,6 +213,33 @@
       },
     },
     methods: {
+
+      deleteUserDialog(user) {
+    // Method to open delete user dialog
+    this.selectedUser = user;
+    this.deleteUserDialogVisible = true;
+  },
+
+
+  async deleteUser() {
+  try {
+    // Perform delete operation by sending a delete request to the backend
+    const response = await axiosInstance.delete(`/users/${this.selectedUser.id}`);
+    console.log('User deleted:', response.data);
+    // Optionally, you can refresh the user list
+    this.fetchUsers();
+    this.deleteSuccessAlertVisible = true;
+
+    setTimeout(() => {
+        this.deleteSuccessAlertVisible = false;
+      }, 4000);
+    // Close delete user dialog
+    this.deleteUserDialogVisible = false;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+  }
+},
+
       async fetchRoles() {
       try {
         // Fetch role options from the backend
@@ -292,11 +323,7 @@
         this.search = '';
       },
       
-      deleteUserDialog(user) {
-        // Method to open delete user dialog
-        this.selectedUser = user;
-        this.deleteUserDialogVisible = true;
-      },
+    
       
       async submitEditUser() {
     try {
@@ -323,14 +350,7 @@
       console.error('Error updating user:', error);
     }
   },
-      
-      deleteUser() {
-        // Method to handle deleting user
-        console.log('Delete user:', this.selectedUser);
-        // Perform delete operation (e.g., send delete request to backend)
-        // Close delete user dialog
-        this.deleteUserDialogVisible = false;
-      },
+   
       async submitAddUser() {
   try {
     // Make an API call to add the new user
